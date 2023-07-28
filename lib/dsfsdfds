@@ -1,0 +1,222 @@
+import 'package:asha_project/ui/login_pagepreg.dart';
+import 'package:asha_project/widgets/pallete.dart';
+import 'package:flutter/material.dart';
+
+class StepperDemo extends StatefulWidget {
+  @override
+  _StepperDemoState createState() => _StepperDemoState();
+}
+
+class _StepperDemoState extends State<StepperDemo> {
+  DateTime? selectedDueDate;
+  TextEditingController dueDateController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController trimesterController = TextEditingController();
+  TextEditingController aadharController = TextEditingController();
+  Future<void> selectDueDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 365)),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Pallete.MainColor, // Set the primary color to pink
+            ),
+            textTheme: TextTheme(
+              bodyText1: TextStyle(
+                color: Pallete.MainColor, // Set the text color to pink
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null && picked != selectedDueDate) {
+      setState(() {
+        selectedDueDate = picked;
+        dueDateController.text = picked.toString().split(' ')[0];
+      });
+    }
+  }
+
+  int _currentStep = 0;
+  StepperType stepperType = StepperType.horizontal;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Pallete.MainColor,
+          automaticallyImplyLeading: false,
+          title: Text('Register Your Account'),
+          centerTitle: true,
+        ),
+        body: Container(
+            child: Theme(
+          data: ThemeData(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: Pallete.MainColor,
+                  background: Colors.grey,
+                  secondary: Pallete.MainColor,
+                ),
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: Stepper(
+                  type: stepperType,
+                  physics: ScrollPhysics(),
+                  currentStep: _currentStep,
+                  onStepTapped: (step) => tapped(step),
+                  onStepContinue: continued,
+                  onStepCancel: cancel,
+                  steps: <Step>[
+                    Step(
+                      title: const Text('Basic \nDetails'),
+                      content: Column(
+                        children: <Widget>[
+                          TextFormField(
+                            controller: nameController,
+                            decoration:
+                                const InputDecoration(labelText: 'Name'),
+                          ),
+                          TextFormField(
+                            controller: ageController,
+                            decoration: const InputDecoration(labelText: 'Age'),
+                          ),
+                          TextFormField(
+                            controller: addressController,
+                            decoration:
+                                const InputDecoration(labelText: 'Address'),
+                          ),
+                          TextFormField(
+                            decoration:
+                                const InputDecoration(labelText: 'Postal code'),
+                          ),
+                          TextFormField(
+                            controller: aadharController,
+                            decoration: const InputDecoration(
+                                labelText: 'Aadhar Number'),
+                          ),
+                          TextFormField(
+                            controller: dueDateController,
+                            readOnly: true,
+                            onTap: () => selectDueDate(context),
+                            decoration: InputDecoration(
+                              labelText: 'Due Date',
+                            ),
+                          ),
+                          TextFormField(
+                            controller: trimesterController,
+                            decoration:
+                                const InputDecoration(labelText: 'Trimester'),
+                          ),
+                          TextFormField(
+                            decoration:
+                                const InputDecoration(labelText: 'LMP Date'),
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'Abortion if any (Yes/No)'),
+                          ),
+                          TextFormField(
+                            controller: trimesterController,
+                            decoration:
+                                const InputDecoration(labelText: 'Trimester'),
+                          ),
+                        ],
+                      ),
+                      isActive: _currentStep >= 0,
+                      state: _currentStep >= 0
+                          ? StepState.complete
+                          : StepState.disabled,
+                    ),
+                    Step(
+                      title: Text('Health \nDetails'),
+                      content: Column(
+                        children: <Widget>[
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'weight in Kg'),
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'Height in Kg'),
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'Urine test (Yes/No)'),
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'Blood sugar test (Yes/No)'),
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText:
+                                    'Contact with any covid +ve patients in last 14 days (Yes/No)'),
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'Any On going disease'),
+                          ),
+                        ],
+                      ),
+                      isActive: _currentStep >= 0,
+                      state: _currentStep >= 1
+                          ? StepState.complete
+                          : StepState.disabled,
+                    ),
+                    Step(
+                      title: const Text('Vaccination'),
+                      content: Column(
+                        children: <Widget>[
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'Corona vaccine (Yes/No)'),
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'TT Vaccine (Yes/No)'),
+                          ),
+                          TextFormField(
+                            decoration: const InputDecoration(
+                                labelText: 'TT Vaccine Date'),
+                          ),
+                        ],
+                      ),
+                      isActive: _currentStep >= 0,
+                      state: _currentStep >= 2
+                          ? StepState.complete
+                          : StepState.disabled,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )));
+  }
+
+  tapped(int step) {
+    setState(() => _currentStep = step);
+  }
+
+  continued() {
+    _currentStep < 2
+        ? setState(() => _currentStep += 1)
+        : Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (ctx) => const LoginPreg()));
+  }
+
+  cancel() {
+    _currentStep > 0 ? setState(() => _currentStep -= 1) : null;
+  }
+}
